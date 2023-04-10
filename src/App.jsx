@@ -1,35 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { Weather } from "./components/Weather";
+import styled, { createGlobalStyle } from 'styled-components';
 
-function App() {
-  const [count, setCount] = useState(0)
+function App () {
+  // styled-components
+  const GlobalStyle = createGlobalStyle`
+    :root {
+      font-family: 'Roboto Slab', Roboto, Helvetica, Arial, sans-serif;
+      font-size: 15px;
+      line-height: 20px;
+      line-height: 1.5;
+      font-weight: 400;
+
+      color-scheme: light dark;
+      color: #FFFFFF;
+
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      width: auto;
+      height: 100vh;
+      background: linear-gradient(180deg, #30BBBB 0%, #6CD6D6 17.71%, #95FFFF 100%);
+    }
+  `
+  const App = styled.div`
+    max-width: 414px;
+    margin: 0 auto;
+    padding: 60px 25px;
+  `
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+    <App>
+      <GlobalStyle />
+      <Weather />
+    </App>
+  );
 }
 
-export default App
+export default App;
