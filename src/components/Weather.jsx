@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "./Axios";
-import 'weather-react-icons/lib/css/weather-icons.css';
+import { WeatherForm } from "./WeatherForm";
+import "weather-react-icons/lib/css/weather-icons.css";
 
 export function Weather() {
   const [weather, setWeather] = useState(false);
@@ -11,41 +12,22 @@ export function Weather() {
   // styled-components
   const Weater = styled.section`
     display: flex;
+    flex-flow: column wrap;
     row-gap: 20px;
     p {
       margin-bottom: 0;
     }
-  `;
-  const WeaterLoading = styled(Weater)`
-    .weatherLoading::after {
-      width: 25px;
-      height: 25px;
-      content: url("data:image/svg+xml,%3Csvg version='1.1' id='L7' xmlns='http://www.w3.org/2000/svg' xmlnsXlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 100 100' enableBackground='new 0 0 100 100' xmlSpace='preserve' width='25' hei ='25'%3E%3Cpath fill='%23fff' d='M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3 c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z'%3E%3CanimateTransform attributeName='transform' attributeType='XML' type='rotate' dur='2s' from='0 50 50' to='360 50 50' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/path%3E%3Cpath fill='%23fff' d='M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7 c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z'%3E%3CanimateTransform attributeName='transform' attributeType='XML' type='rotate' dur='1s' from='0 50 50' to='-360 50 50' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/path%3E%3Cpath fill='%23fff' d='M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5 L82,35.7z'%3E%3CanimateTransform attributeName='transform' attributeType='XML' type='rotate' dur='2s' from='0 50 50' to='360 50 50' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/path%3E%3C/svg%3E");
-    }
-  `;
-  const WeaterBox = styled.div`
-    width: 100%;
-    height: auto;
-    background: #63c9c9;
-    opacity: 0.8;
-    backdrop-filter: blur(4.5px);
-    border-radius: 39px;
-    margin: 0 25px;
-    padding: 25px 40px;
-  `;
-  const WeaterBoxContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    row-gap: 25px;
-    h2 {
-      font-weight: 500;
-      font-size: 30px;
-      line-height: 30px;
-      text-transform: capitalize;
-      margin: 0;
+    .w100 {
+      width: 100%;
     }
     .displayFlex {
       display: flex;
+    }
+    .displayGrid {
+      display: grid;
+    }
+    .gridTemplateColumns {
+      grid-template-columns: repeat(2, 46%);
     }
     .flexDirectionColumn {
       flex-direction: column;
@@ -56,11 +38,41 @@ export function Weather() {
     .alignItemsCenter {
       align-items: center;
     }
+    .rowGap10 {
+      row-gap: 10px;
+    }
     .fontSize85 {
       font-size: 85px;
     }
     .fontWeightSemiBold {
       font-weight: 600;
+    }
+  `;
+  const WeaterLoading = styled(Weater)`
+    .weatherLoading::after {
+      width: 25px;
+      height: 25px;
+      content: url("data:image/svg+xml,%3Csvg version='1.1' id='L7' xmlns='http://www.w3.org/2000/svg' xmlnsXlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 100 100' enableBackground='new 0 0 100 100' xmlSpace='preserve' width='25' hei ='25'%3E%3Cpath fill='%23fff' d='M31.6,3.5C5.9,13.6-6.6,42.7,3.5,68.4c10.1,25.7,39.2,38.3,64.9,28.1l-3.1-7.9c-21.3,8.4-45.4-2-53.8-23.3 c-8.4-21.3,2-45.4,23.3-53.8L31.6,3.5z'%3E%3CanimateTransform attributeName='transform' attributeType='XML' type='rotate' dur='2s' from='0 50 50' to='360 50 50' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/path%3E%3Cpath fill='%23fff' d='M42.3,39.6c5.7-4.3,13.9-3.1,18.1,2.7c4.3,5.7,3.1,13.9-2.7,18.1l4.1,5.5c8.8-6.5,10.6-19,4.1-27.7 c-6.5-8.8-19-10.6-27.7-4.1L42.3,39.6z'%3E%3CanimateTransform attributeName='transform' attributeType='XML' type='rotate' dur='1s' from='0 50 50' to='-360 50 50' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/path%3E%3Cpath fill='%23fff' d='M82,35.7C74.1,18,53.4,10.1,35.7,18S10.1,46.6,18,64.3l7.6-3.4c-6-13.5,0-29.3,13.5-35.3s29.3,0,35.3,13.5 L82,35.7z'%3E%3CanimateTransform attributeName='transform' attributeType='XML' type='rotate' dur='2s' from='0 50 50' to='360 50 50' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/path%3E%3C/svg%3E");
+    }
+  `;
+  const WeaterBox = styled.div`
+    background: #63c9c9;
+    opacity: 0.8;
+    backdrop-filter: blur(4.5px);
+    border-radius: 39px;
+    margin: 0;
+    padding: 25px 35px;
+  `;
+  const WeaterBoxContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    h2 {
+      font-weight: 500;
+      font-size: 30px;
+      line-height: 30px;
+      text-transform: capitalize;
+      margin: 0;
     }
     .weatherDate {
       font-size: 16px;
@@ -68,12 +80,14 @@ export function Weather() {
     .weatherFeelLike {
       font-size: 65px;
       line-height: 65px;
-      color: linear-gradient(
+      background: -webkit-linear-gradient(
         180deg,
         #ffffff 36.96%,
         #ffffff 36.97%,
         #dcdcdc 124.58%
       );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
     .weatherIcon {
       width: 79px;
@@ -82,24 +96,33 @@ export function Weather() {
     }
   `;
   const WeaterInnerBoxContainer = styled(WeaterBoxContainer)`
+    height: -moz-available;
+    height: -webkit-fill-available;
+    height: fill-available;
     flex-direction: column;
-    row-gap: 1px;
+    align-items: center;
+    row-gap: 5px;
     background: rgba(22, 201, 201, 0.64);
     opacity: 0.7;
     border-radius: 22px;
-    padding: 15px 25px;
+    padding: 15px 20px;
   `;
   const WeaterInnerBoxTitle = styled.span`
-    font-size: 15px;
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    column-gap: 5px;
+    font-size: 14px;
     line-height: 18px;
     text-transform: capitalize;
-    text-align: center;
   `;
   const WeaterInnerBoxContent = styled.span`
-    font-size: 12px;
-    line-height: 15px;
+    font-size: 30px;
+    line-height: 30px;
     text-transform: capitalize;
-    text-align: center;
+    sup {
+      line-height: 1;
+    }
   `;
   const ButtonAddWishList = styled.button`
     background: transparent;
@@ -114,6 +137,12 @@ export function Weather() {
     }
   `;
 
+  Date.prototype.getFormatedDate = function () {
+    return `${
+      parseInt(this.getHours()) < 10 ? "0" + this.getHours() : this.getHours()
+    }:${this.getMinutes()}`;
+  };
+
   useEffect(async () => {
     setLoading(true);
     async function fetchData() {
@@ -127,9 +156,9 @@ export function Weather() {
       }
       const request = await axios
         .get(
-          `?lat=${coords.lat}&lon=${coords.lon}&units=metric&lang=fr&appid=${
-            import.meta.env.VITE_WEATHER_API_KEY
-          }`
+          `weather?lat=${coords.lat}&lon=${
+            coords.lon
+          }&units=metric&lang=fr&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
         )
         .then((response) => {
           if (response.status === 200) {
@@ -144,6 +173,10 @@ export function Weather() {
     }
     fetchData();
   }, []);
+
+  const handleUpdate = (obj) => {
+    setWeather(obj);
+  }
 
   if (loading)
     return (
@@ -163,6 +196,7 @@ export function Weather() {
 
   return (
     <Weater>
+      <WeatherForm handleUpdate={handleUpdate} />
       <WeaterBox>
         <WeaterBoxContainer>
           <div className="displayFlex justifyContentSpaceBetween alignItemsCenter">
@@ -183,24 +217,67 @@ export function Weather() {
             </div>
             <div className="weatherIcon"></div>
           </div>
-          <div className="displayFlex justifyContentSpaceBetween alignItemsCenter">
-            <WeaterInnerBoxContainer>
-              <WeaterInnerBoxTitle><i class="wi wi-thermometer"></i>Le plus haut</WeaterInnerBoxTitle>
-              <WeaterInnerBoxContent>
-                {parseInt(weather.main.temp_max)}
-                <sup>°</sup>c
-              </WeaterInnerBoxContent>
-            </WeaterInnerBoxContainer>
-            <WeaterInnerBoxContainer>
-              <WeaterInnerBoxTitle><i class="wi wi-thermometer-exterior"></i>Le plus bas</WeaterInnerBoxTitle>
-              <WeaterInnerBoxContent>
-                {parseInt(weather.main.temp_min)}
-                <sup>°</sup>c
-              </WeaterInnerBoxContent>
-            </WeaterInnerBoxContainer>
-          </div>
         </WeaterBoxContainer>
       </WeaterBox>
+      <div className="displayFlex flexDirectionColumn justifyContentSpaceBetween alignItemsCenter rowGap10">
+        <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
+          <WeaterInnerBoxContainer>
+            <WeaterInnerBoxTitle>
+              <i className="wi wi-thermometer-exterior"></i> Minimale
+            </WeaterInnerBoxTitle>
+            <WeaterInnerBoxContent>
+              {parseInt(weather.main.temp_min)}
+              <sup>°</sup>c
+            </WeaterInnerBoxContent>
+          </WeaterInnerBoxContainer>
+          <WeaterInnerBoxContainer>
+            <WeaterInnerBoxTitle>
+              <i className="wi wi-thermometer"></i> Maximale
+            </WeaterInnerBoxTitle>
+            <WeaterInnerBoxContent>
+              {parseInt(weather.main.temp_max)}
+              <sup>°</sup>c
+            </WeaterInnerBoxContent>
+          </WeaterInnerBoxContainer>
+        </div>
+        <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
+          <WeaterInnerBoxContainer>
+            <WeaterInnerBoxTitle>
+              <i className="wi wi-strong-wind"></i> Vent
+            </WeaterInnerBoxTitle>
+            <WeaterInnerBoxContent>
+              {parseInt(weather.main.temp_max)}
+              <sup>°</sup>c
+            </WeaterInnerBoxContent>
+          </WeaterInnerBoxContainer>
+          <WeaterInnerBoxContainer>
+            <WeaterInnerBoxTitle>
+              <i className="wi wi-humidity"></i> Humidité
+            </WeaterInnerBoxTitle>
+            <WeaterInnerBoxContent>
+              {parseInt(weather.main.humidity)}%
+            </WeaterInnerBoxContent>
+          </WeaterInnerBoxContainer>
+        </div>
+        <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
+          <WeaterInnerBoxContainer>
+            <WeaterInnerBoxTitle>
+              <i className="wi wi-sunrise"></i> Lever
+            </WeaterInnerBoxTitle>
+            <WeaterInnerBoxContent>
+              {new Date(weather.sys.sunrise * 1000).getFormatedDate()}
+            </WeaterInnerBoxContent>
+          </WeaterInnerBoxContainer>
+          <WeaterInnerBoxContainer>
+            <WeaterInnerBoxTitle>
+              <i className="wi wi-sunset"></i> Coucher
+            </WeaterInnerBoxTitle>
+            <WeaterInnerBoxContent>
+              {new Date(weather.sys.sunset * 1000).getFormatedDate()}
+            </WeaterInnerBoxContent>
+          </WeaterInnerBoxContainer>
+        </div>
+      </div>
     </Weater>
   );
 }

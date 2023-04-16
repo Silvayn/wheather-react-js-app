@@ -25,6 +25,8 @@ function App () {
       width: auto;
       height: 100vh;
       background: linear-gradient(180deg, #30BBBB 0%, #6CD6D6 17.71%, #95FFFF 100%);
+      margin: 0;
+      padding: 0;
     }
   `
   const App = styled.div`
