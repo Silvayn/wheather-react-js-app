@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "./Axios";
 import { WeatherForm } from "./WeatherForm";
+import { LineChart } from "./LineChart";
+import { ChartData } from "./ChartData";
 import "weather-react-icons/lib/css/weather-icons.css";
 
 export function Weather() {
@@ -170,13 +172,31 @@ export function Weather() {
         .catch((error) => {
           console.log(error);
         });
+
+      const request2 = await axios
+        .get(
+          `forecast?lat=${coords.lat}&lon=${
+            coords.lon
+          }&units=metric&lang=fr&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            console.log("forecast", response.data);
+            // setWeather(response.data);
+            // setLoading(false);
+          }
+          return () => request2;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
     fetchData();
   }, []);
 
   const handleUpdate = (obj) => {
     setWeather(obj);
-  }
+  };
 
   if (loading)
     return (
@@ -278,6 +298,9 @@ export function Weather() {
           </WeaterInnerBoxContainer>
         </div>
       </div>
+      <WeaterBox>
+        <LineChart data={ChartData} />
+      </WeaterBox>
     </Weater>
   );
 }
