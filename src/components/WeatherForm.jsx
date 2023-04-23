@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styled from "styled-components";
-import axios from "./Axios";
+import axios from "axios";
+import { endpointWeather, endpointForecast } from "../config/endpoints";
 
 export function WeatherForm({ handleUpdate }) {
   const [city, setCity] = useState("");
@@ -15,7 +16,7 @@ export function WeatherForm({ handleUpdate }) {
     font-weight: 300;
     font-size: 25px;
     line-height: 33px;
-    color: #88BBBB;
+    color: #88bbbb;
     background: #ffffff;
     mix-blend-mode: normal;
     border-radius: 70px;
@@ -30,12 +31,12 @@ export function WeatherForm({ handleUpdate }) {
     outline: none;
     box-shadow: none;
     ::after {
-        content: url("data:image/svg+xml,%3Csvg width='34' height='31' viewBox='0 0 34 31' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg style='mix-blend-mode:hard-light'%3E%3Cpath d='M32 28.7392L24.75 22.2772' stroke='%231B6464' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M15.3333 25.7681C22.6971 25.7681 28.6667 20.4475 28.6667 13.8841C28.6667 7.32068 22.6971 2 15.3333 2C7.96954 2 2 7.32068 2 13.8841C2 20.4475 7.96954 25.7681 15.3333 25.7681Z' stroke='%231B6464' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
-        position: absolute;
-        top: 50%;
-        left: 13px;
-        transform: translateY(-50%);
-        z-index: 99;
+      content: url("data:image/svg+xml,%3Csvg width='34' height='31' viewBox='0 0 34 31' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg style='mix-blend-mode:hard-light'%3E%3Cpath d='M32 28.7392L24.75 22.2772' stroke='%231B6464' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M15.3333 25.7681C22.6971 25.7681 28.6667 20.4475 28.6667 13.8841C28.6667 7.32068 22.6971 2 15.3333 2C7.96954 2 2 7.32068 2 13.8841C2 20.4475 7.96954 25.7681 15.3333 25.7681Z' stroke='%231B6464' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+      position: absolute;
+      top: 50%;
+      left: 13px;
+      transform: translateY(-50%);
+      z-index: 99;
     }
   `;
 
@@ -48,18 +49,17 @@ export function WeatherForm({ handleUpdate }) {
   };
 
   async function fetchData() {
-    const request = await axios
-      .get(
-        `weather?q=${city}&units=metric&lang=fr&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
+    axios
+      .all(
+        [endpointWeather(`q=${city}`), endpointForecast(`q=${city}`)].map(
+          (endpoint) => axios.get(`${endpoint}`)
+        )
       )
-      .then((response) => {
-        if (response.status === 200) {
-            handleUpdate(response.data);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+      .then(
+        axios.spread(({ data: weather }, { data: forecast }) => {
+          handleUpdate({ data: weather, forecast: forecast.list });
+        })
+      );
   }
 
   return (
@@ -78,5 +78,5 @@ export function WeatherForm({ handleUpdate }) {
         title="Rechercher"
       ></WeatherButton>
     </WeatherForm>
-  )
+  );
 }

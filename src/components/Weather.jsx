@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import axios from "./Axios";
+import axios from "axios";
+import { endpointWeather, endpointForecast } from "../config/endpoints";
 import { WeatherForm } from "./WeatherForm";
 import { LineChart } from "./LineChart";
-import { ChartData } from "./ChartData";
 import "weather-react-icons/lib/css/weather-icons.css";
 
 export function Weather() {
-  const [weather, setWeather] = useState(false);
+  const [weather, setWeather] = useState({ data: null, forecast: null });
   const [coords, setCoords] = useState({ lat: 48.8534, lon: 2.3488 });
   const [loading, setLoading] = useState(true);
 
@@ -156,54 +156,27 @@ export function Weather() {
           });
         });
       }
-      const request = await axios
-        .get(
-          `weather?lat=${coords.lat}&lon=${
-            coords.lon
-          }&units=metric&lang=fr&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
-        )
-        .then((response) => {
-          if (response.status === 200) {
-            setWeather(response.data);
-            setLoading(false);
-          }
-          return () => request;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
 
-      const request2 = await axios
-        .get(
-          `forecast?lat=${coords.lat}&lon=${
-            coords.lon
-          }&units=metric&lang=fr&appid=${import.meta.env.VITE_WEATHER_API_KEY}`
+      axios
+        .all(
+          [
+            endpointWeather(`lat=${coords.lat}&lon=${coords.lon}`),
+            endpointForecast(`lat=${coords.lat}&lon=${coords.lon}`),
+          ].map((endpoint) => axios.get(`${endpoint}`))
         )
-        .then((response) => {
-          if (response.status === 200) {
-            console.log("forecast", response.data);
-            // setWeather(response.data);
-            // setLoading(false);
-          }
-          return () => request2;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+        .then(
+          axios.spread(({ data: weather }, { data: forecast }) => {
+            setWeather({ data: weather, forecast: forecast });
+            setLoading(false);
+          })
+        );
     }
     fetchData();
   }, []);
 
-  const handleUpdate = (obj) => {
-    setWeather(obj);
+  const handleUpdate = ({ data, forecast }) => {
+    setWeather({ data: data, forecast: forecast });
   };
-
-  if (loading)
-    return (
-      <WeaterLoading>
-        <div className="weatherLoading"></div>
-      </WeaterLoading>
-    );
 
   if (!weather)
     return (
@@ -212,95 +185,103 @@ export function Weather() {
       </Weater>
     );
 
-  console.log("weather", weather);
+  console.log("weather", weather.forecast);
 
   return (
     <Weater>
-      <WeatherForm handleUpdate={handleUpdate} />
-      <WeaterBox>
-        <WeaterBoxContainer>
-          <div className="displayFlex justifyContentSpaceBetween alignItemsCenter">
-            <div className="displayFlex flexDirectionColumn">
-              <h2>{weather.name}</h2>
-              <span className="weatherDate">
-                {new Date().toLocaleDateString("fr")}
-              </span>
+      {!loading ? (
+        <>
+          <WeatherForm handleUpdate={handleUpdate} />
+          <WeaterBox>
+            <WeaterBoxContainer>
+              <div className="displayFlex justifyContentSpaceBetween alignItemsCenter">
+                <div className="displayFlex flexDirectionColumn">
+                  <h2>{weather.data.name}</h2>
+                  <span className="weatherDate">
+                    {new Date().toLocaleDateString("fr")}
+                  </span>
+                </div>
+                <ButtonAddWishList></ButtonAddWishList>
+              </div>
+              <div className="displayFlex justifyContentSpaceBetween alignItemsCenter">
+                <div className="weatherFeelLike">
+                  <span className="fontSize85 fontWeightSemiBold">
+                    {parseInt(weather.data.main.feels_like)}
+                  </span>
+                  <sup className="fontWeightSemiBold">°</sup>c
+                </div>
+                <div className="weatherIcon"></div>
+              </div>
+            </WeaterBoxContainer>
+          </WeaterBox>
+          <div className="displayFlex flexDirectionColumn justifyContentSpaceBetween alignItemsCenter rowGap10">
+            <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
+              <WeaterInnerBoxContainer>
+                <WeaterInnerBoxTitle>
+                  <i className="wi wi-thermometer-exterior"></i> Minimale
+                </WeaterInnerBoxTitle>
+                <WeaterInnerBoxContent>
+                  {parseInt(weather.data.main.temp_min)}
+                  <sup>°</sup>c
+                </WeaterInnerBoxContent>
+              </WeaterInnerBoxContainer>
+              <WeaterInnerBoxContainer>
+                <WeaterInnerBoxTitle>
+                  <i className="wi wi-thermometer"></i> Maximale
+                </WeaterInnerBoxTitle>
+                <WeaterInnerBoxContent>
+                  {parseInt(weather.data.main.temp_max)}
+                  <sup>°</sup>c
+                </WeaterInnerBoxContent>
+              </WeaterInnerBoxContainer>
             </div>
-            <ButtonAddWishList></ButtonAddWishList>
-          </div>
-          <div className="displayFlex justifyContentSpaceBetween alignItemsCenter">
-            <div className="weatherFeelLike">
-              <span className="fontSize85 fontWeightSemiBold">
-                {parseInt(weather.main.feels_like)}
-              </span>
-              <sup className="fontWeightSemiBold">°</sup>c
+            <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
+              <WeaterInnerBoxContainer>
+                <WeaterInnerBoxTitle>
+                  <i className="wi wi-strong-wind"></i> Vent
+                </WeaterInnerBoxTitle>
+                <WeaterInnerBoxContent>
+                  {parseInt(weather.data.main.temp_max)}
+                  <sup>°</sup>c
+                </WeaterInnerBoxContent>
+              </WeaterInnerBoxContainer>
+              <WeaterInnerBoxContainer>
+                <WeaterInnerBoxTitle>
+                  <i className="wi wi-humidity"></i> Humidité
+                </WeaterInnerBoxTitle>
+                <WeaterInnerBoxContent>
+                  {parseInt(weather.data.main.humidity)}%
+                </WeaterInnerBoxContent>
+              </WeaterInnerBoxContainer>
             </div>
-            <div className="weatherIcon"></div>
+            <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
+              <WeaterInnerBoxContainer>
+                <WeaterInnerBoxTitle>
+                  <i className="wi wi-sunrise"></i> Lever
+                </WeaterInnerBoxTitle>
+                <WeaterInnerBoxContent>
+                  {new Date(weather.data.sys.sunrise * 1000).getFormatedDate()}
+                </WeaterInnerBoxContent>
+              </WeaterInnerBoxContainer>
+              <WeaterInnerBoxContainer>
+                <WeaterInnerBoxTitle>
+                  <i className="wi wi-sunset"></i> Coucher
+                </WeaterInnerBoxTitle>
+                <WeaterInnerBoxContent>
+                  {new Date(weather.data.sys.sunset * 1000).getFormatedDate()}
+                </WeaterInnerBoxContent>
+              </WeaterInnerBoxContainer>
+            </div>
           </div>
-        </WeaterBoxContainer>
-      </WeaterBox>
-      <div className="displayFlex flexDirectionColumn justifyContentSpaceBetween alignItemsCenter rowGap10">
-        <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
-          <WeaterInnerBoxContainer>
-            <WeaterInnerBoxTitle>
-              <i className="wi wi-thermometer-exterior"></i> Minimale
-            </WeaterInnerBoxTitle>
-            <WeaterInnerBoxContent>
-              {parseInt(weather.main.temp_min)}
-              <sup>°</sup>c
-            </WeaterInnerBoxContent>
-          </WeaterInnerBoxContainer>
-          <WeaterInnerBoxContainer>
-            <WeaterInnerBoxTitle>
-              <i className="wi wi-thermometer"></i> Maximale
-            </WeaterInnerBoxTitle>
-            <WeaterInnerBoxContent>
-              {parseInt(weather.main.temp_max)}
-              <sup>°</sup>c
-            </WeaterInnerBoxContent>
-          </WeaterInnerBoxContainer>
-        </div>
-        <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
-          <WeaterInnerBoxContainer>
-            <WeaterInnerBoxTitle>
-              <i className="wi wi-strong-wind"></i> Vent
-            </WeaterInnerBoxTitle>
-            <WeaterInnerBoxContent>
-              {parseInt(weather.main.temp_max)}
-              <sup>°</sup>c
-            </WeaterInnerBoxContent>
-          </WeaterInnerBoxContainer>
-          <WeaterInnerBoxContainer>
-            <WeaterInnerBoxTitle>
-              <i className="wi wi-humidity"></i> Humidité
-            </WeaterInnerBoxTitle>
-            <WeaterInnerBoxContent>
-              {parseInt(weather.main.humidity)}%
-            </WeaterInnerBoxContent>
-          </WeaterInnerBoxContainer>
-        </div>
-        <div className="w100 displayGrid gridTemplateColumns justifyContentSpaceBetween alignItemsCenter">
-          <WeaterInnerBoxContainer>
-            <WeaterInnerBoxTitle>
-              <i className="wi wi-sunrise"></i> Lever
-            </WeaterInnerBoxTitle>
-            <WeaterInnerBoxContent>
-              {new Date(weather.sys.sunrise * 1000).getFormatedDate()}
-            </WeaterInnerBoxContent>
-          </WeaterInnerBoxContainer>
-          <WeaterInnerBoxContainer>
-            <WeaterInnerBoxTitle>
-              <i className="wi wi-sunset"></i> Coucher
-            </WeaterInnerBoxTitle>
-            <WeaterInnerBoxContent>
-              {new Date(weather.sys.sunset * 1000).getFormatedDate()}
-            </WeaterInnerBoxContent>
-          </WeaterInnerBoxContainer>
-        </div>
-      </div>
-      <WeaterBox>
-        <LineChart data={ChartData} />
-      </WeaterBox>
+          <WeaterBox>
+            <LineChart data={weather.forecast.list} />
+          </WeaterBox>
+        </>
+      ) : (
+        <WeaterLoading>
+          <div className="weatherLoading"></div>
+        </WeaterLoading>
+      )}
     </Weater>
   );
 }
